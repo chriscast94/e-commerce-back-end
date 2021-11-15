@@ -7,12 +7,34 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
+  try {
+    const allProductData = Product.findAll(({ include: [Category, Tag] }));
+    res.status(200).json(allProductData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 });
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
+  try {
+    const singleProduct = Tag.findByPk(req.params.id, {
+      include: [Category, Tag],
+    });
+
+    if (!singleProduct) {
+      res.status(404).json({ message: "No product with this id!" });
+      return
+    }
+
+    res.status(200).json(singleProduct);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+
 });
 
 // create new product
@@ -91,6 +113,26 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  try {
+    const deletedProductData = Traveller.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!deletedProductData) {
+      res.status(404).json({ message: 'No product found with this id!' });
+      return;
+    }
+
+    res.status(200).json(deletedProductData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 });
 
 module.exports = router;
+
+//Received hint/help from miniproject traveller code (directed from homework instructions)
+
